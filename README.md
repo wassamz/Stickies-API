@@ -44,5 +44,5 @@ Dockerfile included to deploy as a standalone frontend server.
 Sample deploy commands:
 ```bash
 docker build -t stickies-api .
-docker run --name stickies-api -p 3001:3001 keeper-api
+docker run --name stickies-api -p 3001:3001 stickies-api
 ```
