@@ -1,5 +1,5 @@
 import express from "express";
-import { check } from "express-validator";
+import { check, validationResult } from "express-validator";
 
 import usersController from "../controllers/users.controller.js";
 import { checkRefreshToken } from "../middlewares/auth.middleware.js";
@@ -14,10 +14,16 @@ router.post(
     check("email").normalizeEmail().isEmail(),
     check("password").isLength({ min: 6 }),
   ],
+  validateRequest,
   usersController.signup
 );
 
-router.post("/login", usersController.login);
+router.post(
+  "/login",
+  [check("email").normalizeEmail().isEmail()],
+  validateRequest,
+  usersController.login
+);
 
 router.post("/refresh-token", checkRefreshToken, (req, res) => {
   const userId = req.body.userId;
@@ -27,5 +33,13 @@ router.post("/refresh-token", checkRefreshToken, (req, res) => {
     accessToken: newAccessToken,
   });
 });
+
+function validateRequest(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+}
 
 export default router;
