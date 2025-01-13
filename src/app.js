@@ -7,10 +7,11 @@ import config from "./config/config.js";
 import { authLimiter } from "./middlewares/rateLimiter.middleware.js";
 import notesRouter from "./routes/notes.route.js";
 import usersRouter from "./routes/users.route.js";
-import { initializeDatabase } from "./utils/database.js"; // Hypothetical utility for database connection
-import { gracefulShutdown } from "./utils/shutdown.js"; // Hypothetical utility for graceful shutdown
+import { initializeDatabase } from "./utils/database.js"; 
+import { gracefulShutdown } from "./utils/shutdown.js";
 
 const app = express();
+
 
 // Middleware setup
 function setupMiddleware(app) {
@@ -31,17 +32,18 @@ function setupMiddleware(app) {
 
   console.log("Allowed Frontend site: " + config.allowedOrigin);
 
+  // Serve static files from the 'public' directory
   app.use(express.static("public"));
   app.use("/notes", notesRouter);
   app.use("/users", usersRouter);
 
   // Catch-all route for undefined routes
-  app.use((req, res) => {
-    res.sendFile(path.resolve(__dirname, "public", "index.html"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
   });
 
   // Error-handling middleware
-  app.use((err, req, res) => {
+  app.use((err, req, res, next) => {
     console.error(err); // For debugging, logs the error stack
     res.status(err.status || 500).json({
       error: err.message || "Internal Server Error",
