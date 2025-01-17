@@ -25,6 +25,24 @@ router.post(
   usersController.login
 );
 
+router.post(
+  "/forgotPassword",
+  [check("email").normalizeEmail().isEmail()],
+  validateRequest,
+  usersController.forgotPassword
+);
+
+router.post(
+  "/resetPassword",
+  [
+    check("email").normalizeEmail().isEmail(),
+    check("otp").isNumeric().not().isEmpty(),
+    check("newPassword").isLength({ min: 6 })
+  ],
+  validateRequest,
+  usersController.resetPassword
+);
+
 router.post("/refresh-token", checkRefreshToken, (req, res) => {
   const userId = req.body.userId;
   // Generate new token
