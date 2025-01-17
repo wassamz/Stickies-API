@@ -7,7 +7,7 @@ import logger from "../utils/logger.js";
 
 async function saveUser(userData) {
   try {
-    logger.info("User Create: " + userData?.email);
+    logger.debug("User Create: " + userData?.email);
     let user = new User(userData);
     user = await user.save(); //save will encrypt the password
     return user;
@@ -18,18 +18,18 @@ async function saveUser(userData) {
 }
 
 async function getUser(email) {
-  logger.info("User Retrieve: " + email);
+  logger.debug("User Retrieve: " + email);
   try {
     let user = await User.findOne({ email: email });
     return user;
   } catch (error) {
     logger.error("Unable to find user: ", error);
-    return { error: "Unable to find user" };
+    return null;
   }
 }
 
 async function validateUser(email, password) {
-  logger.info("User Validate: " + email);
+  logger.debug("User Validate: " + email);
   try {
     let user = await User.findOne({ email: email });
     if (!user) return null;
@@ -43,7 +43,7 @@ async function validateUser(email, password) {
   }
 }
 async function forgotPassword(email) {
-  logger.info("forgotPassword: " + email);
+  logger.debug("forgotPassword: " + email);
 
   const user = await getUser(email);
 
@@ -81,11 +81,11 @@ async function forgotPassword(email) {
   }
 
   logger.info(`Sending OTP ${otpData.otp} to email: ${email}`);
-  return "Success";
+  return { message: "OTP Forgot Password proccessed successfully" };
 }
 
 async function resetPassword(email, otp, newPassword) {
-  logger.info(`resetPassword: ${email} OTP: ${otp}`);
+  logger.debug(`resetPassword: ${email} OTP: ${otp}`);
 
   let user = await getUser(email);
   if (!user) return null; //no user found
@@ -113,7 +113,7 @@ async function resetPassword(email, otp, newPassword) {
 
     //delete OTP record
     await OTP.findByIdAndDelete(otpData._id);
-    return "Success";
+    return { message: "OTP Reset Password proccessed successfully" };
   }
   return null;
 }

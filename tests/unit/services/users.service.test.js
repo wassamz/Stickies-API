@@ -37,7 +37,7 @@ describe("Users Service", () => {
         email: "test@example.com",
         password: "password123",
       };
-      const errorMessage = { error: "Unable to create user" }; ;
+      const errorMessage = { error: "Unable to create user" };
 
       User.prototype.save.mockImplementation(() =>
         Promise.resolve(errorMessage)
@@ -75,7 +75,7 @@ describe("Users Service", () => {
       User.findOne.mockRejectedValueOnce(new Error(errorMessage));
 
       const user = await userService.getUser(mockEmail);
-      expect(user).toEqual({ error: "Unable to find user" });
+      expect(user).toEqual(null);
       expect(User.findOne).toHaveBeenCalledWith({ email: mockEmail }); // Verify arguments passed
     });
   });
@@ -85,15 +85,19 @@ describe("Users Service", () => {
       const mockEmail = "test@example.com";
       const mockUser = { _id: "123", email: mockEmail };
       const mockOTP = { userId: mockUser._id, otp: 1234, retries: 1 };
-
+      const successMessage = {
+        message: "OTP Forgot Password proccessed successfully",
+      };
       User.findOne.mockResolvedValueOnce(mockUser);
       OTP.findOne.mockResolvedValueOnce(null);
       OTP.prototype.save.mockResolvedValueOnce(mockOTP);
       sendOTPEmail.mockResolvedValueOnce();
-      const randomIntMock = vi.spyOn(crypto, "randomInt").mockReturnValue(mockOTP.otp);
+      const randomIntMock = vi
+        .spyOn(crypto, "randomInt")
+        .mockReturnValue(mockOTP.otp);
 
-      const result = await userService.forgotPassword(mockEmail); 
-      expect(result).toEqual("Success");
+      const result = await userService.forgotPassword(mockEmail);
+      expect(result).toEqual(successMessage);
       expect(User.findOne).toHaveBeenCalledWith({ email: mockEmail });
       expect(OTP.prototype.save).toHaveBeenCalled();
       expect(sendOTPEmail).toHaveBeenCalledWith(mockEmail, mockOTP.otp);
@@ -114,7 +118,7 @@ describe("Users Service", () => {
       const mockEmail = "test@example.com";
       const mockUser = { _id: "123", email: mockEmail };
       const mockOTP = {
-        userId: mockUser._id, 
+        userId: mockUser._id,
         otp: 1234,
         retries: config.pwdMaxForgetRetryAttempts,
       };
@@ -137,13 +141,16 @@ describe("Users Service", () => {
         retries: 1,
         save: vi.fn().mockResolvedValueOnce(),
       };
+      const successMessage = {
+        message: "OTP Forgot Password proccessed successfully",
+      };
 
       User.findOne.mockResolvedValueOnce(mockUser);
       OTP.findOne.mockResolvedValueOnce(mockOTP);
       sendOTPEmail.mockResolvedValueOnce();
 
       const result = await userService.forgotPassword(mockEmail);
-      expect(result).toEqual("Success");
+      expect(result).toEqual(successMessage);
       expect(User.findOne).toHaveBeenCalledWith({ email: mockEmail });
       expect(OTP.findOne).toHaveBeenCalledWith({ userId: mockUser._id });
       expect(mockOTP.save).toHaveBeenCalled();
@@ -162,6 +169,9 @@ describe("Users Service", () => {
         save: vi.fn().mockResolvedValueOnce(),
       };
       const mockOTPData = { userId: mockUser._id, otp: mockOTP, retries: 1 };
+      const successMessage = {
+        message: "OTP Reset Password proccessed successfully",
+      };
 
       User.findOne.mockResolvedValueOnce(mockUser);
       OTP.findOne.mockResolvedValueOnce(mockOTPData);
@@ -172,7 +182,7 @@ describe("Users Service", () => {
         mockOTP,
         mockNewPassword
       );
-      expect(result).toEqual("Success");
+      expect(result).toEqual(successMessage);
       expect(User.findOne).toHaveBeenCalledWith({ email: mockEmail });
       expect(OTP.findOne).toHaveBeenCalledWith({ userId: mockUser._id });
       expect(mockUser.save).toHaveBeenCalled();
