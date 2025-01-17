@@ -22,7 +22,11 @@ PORT - Port to listen to for requests
 
 3. FRONTEND_DOMAIN - Used for CORS origins to secure browser requests
 
-4. JWT - settings to secure Access and Refresh Tokens
+4. JWT - Settings to secure Access and Refresh Tokens
+
+5. PWD - password related policy settings 
+
+6. SMTP - Mail server settings
 
 A sample environment is included.
 
