@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import config from "../config/config.js";
+import logger from "../utils/logger.js";
 
 const transporter = nodemailer.createTransport({
   host: config.smtpHost,
@@ -47,9 +48,9 @@ async function sendOTPEmail(to, otp) {
   const mailOptions = otpMailOptions(to, otp);
   try {
     await transporter.sendMail(mailOptions);
-    console.log("OTP email sent to: " + to);
+    logger.info("OTP email sent to: " + to);
   } catch (error) {
-    console.error("Error sending OTP email: ", error);
+    logger.error("Error sending OTP email: ", error);
   }
 }
 

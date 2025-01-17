@@ -1,5 +1,7 @@
 import { model, Schema, SchemaTypes } from "mongoose";
 import config from "../config/config.js";
+import logger from "../utils/logger.js";
+
 const defaultExpiration = 600; // 10 minutes
 
 const OTPSchema = new Schema(
@@ -38,7 +40,7 @@ const OTP = model("OTP", OTPSchema);
 
 // Force index creation
 OTP.syncIndexes()
-  .then(() => console.log("Indexes created"))
-  .catch((err) => console.error("Error creating indexes", err));
+  .then(() => logger.info("MongoDB Indexes created for OTP"))
+  .catch((err) => logger.error("Error creating MongoDB indexes for OTP", err));
 
 export default OTP;

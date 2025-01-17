@@ -3,6 +3,7 @@ import config from "../config/config.js";
 import usersService from "../services/users.service.js";
 import { createAccessToken, createRefreshToken } from "../utils/auth.js";
 import ms from "ms"; //utility function to convert string to milliseconds
+import logger from "../utils/logger.js";
 
 const cookieOptions = {
   httpOnly: true,
@@ -15,7 +16,7 @@ const signup = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log(errors.array());
+      logger.info(errors.array());
       return res.status(500).json({ errors: errors.array() });
     }
     const { email } = req.body;
@@ -36,7 +37,7 @@ const signup = async (req, res, next) => {
         accessToken: accessToken, // Send the access token in the response body
       });
   } catch (error) {
-    console.error("Unable to sign up user: ", error);
+    logger.error("Unable to sign up user: ", error);
     next(error);
   }
 };

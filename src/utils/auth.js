@@ -1,5 +1,6 @@
 import jsonwebtoken from "jsonwebtoken";
 import config from "../config/config.js";
+import logger from "../utils/logger.js";
 
 const { sign, verify } = jsonwebtoken;
 
@@ -32,12 +33,12 @@ export function validateJSONToken(token, tokenType) {
         decoded.type !== tokenTypes.REFRESH) ||
       (tokenType === tokenTypes.ACCESS && decoded.type !== tokenTypes.ACCESS)
     ) {
-      console.error("Token Type is incorrect.");
+      logger.error("Token Type is incorrect.");
       throw new Error("Invalid token type");
     }
     return decoded;
   } catch (error) {
-    console.error("Token validation Error: " + error);
+    logger.error("Token validation Error: " + error);
     throw new Error("Invalid token type");
   }
 }
