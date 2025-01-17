@@ -2,6 +2,14 @@ import { validationResult } from "express-validator";
 import config from "../config/config.js";
 import usersService from "../services/users.service.js";
 import { createAccessToken, createRefreshToken } from "../utils/auth.js";
+import ms from "ms"; //utility function to convert string to milliseconds
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: config.nodeenv === "production", // Set Secure flag only in production
+  sameSite: "Strict", // CSRF protection
+  maxAge: ms(config.jwtRefreshExpireTime), // Cookie expiration in milliseconds
+}
 
 const signup = async (req, res, next) => {
   try {
@@ -21,13 +29,8 @@ const signup = async (req, res, next) => {
 
     // Set the refresh token in HttpOnly cookie and send the access token in the response
     res
-      .cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: config.nodeenv === "production", // Set Secure flag only in production
-        sameSite: "Strict", // CSRF protection
-        maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expiration (7 days)
-      })
-      .status(201)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .status(201) // Status code for successful resource creation
       .json({
         message: "User created.",
         accessToken: accessToken, // Send the access token in the response body
@@ -60,12 +63,7 @@ const login = async (req, res) => {
 
   // Set the refresh token in HttpOnly cookie and send the access token in the response
   res
-    .cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: false, // Set Secure flag only in production
-      sameSite: "strict", // CSRF protection
-      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expiration (7 days)
-    })
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .status(200) // Status code for successful login
     .json({
       message: "Login successful",
@@ -73,4 +71,17 @@ const login = async (req, res) => {
     });
 };
 
-export default { signup, login };
+const forgotPassword = async (req, res) => {
+  const result = await usersService.forgotPassword(req.body.email);
+  if (!result) res.status(404).json({ error: "Forgot Password unsuccessful" });
+  res.status(200).json({ message: "OTP sent to email on record." });
+};
+
+const resetPassword = async (req, res) => {
+  const { email, newPassword, otp } = req.body;
+  const result = await usersService.resetPassword(email, otp, newPassword);
+  if (!result) res.status(400).json({ error: "Password Reset unsuccessful" });
+  else res.status(200).json({ message: "Password reset successful." });
+};
+
+export default { signup, login, forgotPassword, resetPassword };
