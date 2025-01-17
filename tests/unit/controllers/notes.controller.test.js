@@ -37,9 +37,9 @@ describe("Notes Controller", () => {
     });
 
     it("should respond with 500 if there is an error", async () => {
-      const mockError = { error: "Unable to find notes" };
+      const mockError = { error: "Unable to retrieve note(s)" };
       // Mock the error response of the getNotes method
-      notesService.default.getNotes.mockResolvedValue(mockError);
+      notesService.default.getNotes.mockResolvedValue(null);
 
       await notesController.get(req, res, next);
 
@@ -63,7 +63,7 @@ describe("Notes Controller", () => {
 
     it("should respond with 500 if there is an error", async () => {
       const mockError = { error: "Unable to create note" };
-      notesService.default.create.mockResolvedValue(mockError);
+      notesService.default.create.mockResolvedValue(null);
 
       await notesController.create(req, res, next);
 
@@ -86,7 +86,7 @@ describe("Notes Controller", () => {
     });
     it("should respond with 500 if there is an error", async () => {
       const mockError = { error: "Error updating note" };
-      notesService.default.update.mockResolvedValue(mockError); // Mock rejection for error
+      notesService.default.update.mockResolvedValue(null); // Mock rejection for error
 
       await notesController.update(req, res, next);
 
@@ -98,16 +98,13 @@ describe("Notes Controller", () => {
 
   describe("remove", () => {
     it("should respond with 201 and result if no error", async () => {
-      const mockResult = {
-        message: "Note deleted successfully",
-        note: { id: "123" },
-      };
-      req.params.id = "123";
+      const mockResult = { message: "Note deleted successfully" };
+
       notesService.default.remove.mockResolvedValue(mockResult);
 
       await notesController.remove(req, res, next);
 
-      expect(notesService.default.remove).toHaveBeenCalledWith(req.params.id);
+      expect(notesService.default.remove).toHaveBeenCalledWith(req.body.id);
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(mockResult);
     });
@@ -115,7 +112,7 @@ describe("Notes Controller", () => {
     it("should respond with 500 if there is an error", async () => {
       const mockError = { error: "Error deleting note" };
       req.params.id = "123";
-      notesService.default.remove.mockResolvedValue(mockError); // Mock rejection for error
+      notesService.default.remove.mockResolvedValue(null); // Mock rejection for error
 
       await notesController.remove(req, res, next);
 

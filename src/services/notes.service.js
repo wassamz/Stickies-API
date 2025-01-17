@@ -2,32 +2,32 @@ import Note from "../models/Note.js";
 import logger from "../utils/logger.js";
 
 async function getNotes(userId) {
-  logger.info("Note Retrieve for user: " + JSON.stringify(userId));
+  logger.debug("Note Retrieve for user: " + JSON.stringify(userId));
   if (!userId) return [];
 
   try {
     let notes = await Note.find(userId);
     return notes;
   } catch (error) {
-    logger.error("Unable to find notes", error);
-    return { error: "Unable to find notes" };
+    logger.error("Unable to retrieve notes", error);
+    return null;
   }
 }
 
 async function create(note) {
-  logger.info("Note Update: " + JSON.stringify(note));
+  logger.debug("Note Update: " + JSON.stringify(note));
   try {
     const newNote = new Note(note);
     const result = await newNote.save();
     return result;
   } catch (error) {
     logger.error("Unable to create note: ", error);
-    return { error: "Unable to create note" };
+    return null;
   }
 }
 
 async function update(note) {
-  logger.info("Note Update: " + JSON.stringify(note));
+  logger.debug("Note Update: " + JSON.stringify(note));
   const { _id, title, content } = note;
   try {
     const updatedNote = await Note.findByIdAndUpdate(
@@ -36,33 +36,34 @@ async function update(note) {
       { new: true } // Return the updated document
     );
     if (!updatedNote) {
-      logger.error("Note not found: ", JSON.stringify(updatedNote));
-      return { error: "Note not found" };
+      logger.error("Trying to update note that does not exist: ", JSON.stringify(updatedNote));
+      return null;
     }
 
     return updatedNote;
   } catch (error) {
-    logger.error("Unable to update error: ", error);
-    return { error: "Error updating note" };
+    logger.error("Unable to update note: ", error);
+    return null;
   }
 }
 
 async function remove(id) {
-  logger.info("Note Delete id:" + JSON.stringify(id));
+  logger.debug("Note Delete id:" + JSON.stringify(id));
   if (!id) {
     logger.error("ID is required for deletion: ");
-    return { error: "ID is required" };
+    return null;
   }
 
   try {
     const deletedNote = await Note.findByIdAndDelete(id);
     if (!deletedNote) {
-      return { error: "Note not found" };
+      logger.error("Trying to delete note that does not exist: ", JSON.stringify(deletedNote));
+      return null;
     }
-    return { message: "Note deleted successfully", note: deletedNote };
+    return {message: "Note removed successfully"};
   } catch (error) {
     logger.error("Unable to delete note: ", error);
-    return { error: "Error deleting note" };
+    return null;
   }
 }
 

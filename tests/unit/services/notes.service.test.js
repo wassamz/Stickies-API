@@ -23,7 +23,7 @@ describe("Notes Service", () => {
     });
 
     it("should return an error message if there is a problem retrieving notes", async () => {
-      const errorMessage = { error: "Unable to find notes" };
+      const errorMessage = null; //returns null if there is no error
       Note.find.mockRejectedValue(new Error("Database Error"));
 
       const result = await notesService.getNotes("123");
@@ -53,14 +53,14 @@ describe("Notes Service", () => {
           title: "Test Note",
           content: "Test Content",
         };
-        const errorMessage = "Unable to create note";
+        const errorMessage =null;
 
         Note.mockImplementation(() => ({
           save: vi.fn().mockRejectedValue(new Error(errorMessage)),
         }));
 
         const result = await notesService.create(mockNoteData);
-        expect(result).toEqual({ error: errorMessage });
+        expect(result).toEqual(errorMessage);
         expect(Note.prototype.save).toHaveBeenCalledWith();
       });
     });
@@ -95,10 +95,12 @@ describe("Notes Service", () => {
         title: "Updated Title",
         content: "Updated Content",
       };
+      const errorMessage = null;
+
       Note.findByIdAndUpdate.mockResolvedValue(null); // Simulate no note found
 
       const result = await notesService.update(mockNote);
-      expect(result).toEqual({ error: "Note not found" });
+      expect(result).toEqual(errorMessage);
       expect(Note.findByIdAndUpdate).toHaveBeenCalledWith(
         "123",
         { title: "Updated Title", content: "Updated Content" },
@@ -107,7 +109,7 @@ describe("Notes Service", () => {
     });
 
     it("should return an error if there is a problem updating the note", async () => {
-      const errorMessage = { error: "Error updating note" };
+      const errorMessage = null;
       Note.findByIdAndUpdate.mockRejectedValue(new Error("Database Error"));
 
       const result = await notesService.update({
@@ -130,28 +132,26 @@ describe("Notes Service", () => {
       Note.findByIdAndDelete.mockResolvedValue(mockDeletedNote);
 
       const result = await notesService.remove("123");
-      expect(result).toEqual({
-        message: "Note deleted successfully",
-        note: mockDeletedNote,
-      });
+      expect(result).toEqual({message: "Note removed successfully"});
       expect(Note.findByIdAndDelete).toHaveBeenCalledWith("123");
     });
 
     it("should return an error if no ID is provided for deletion", async () => {
+      const errorMessage = null;
       const result = await notesService.remove();
-      expect(result).toEqual({ error: "ID is required" });
+      expect(result).toEqual(errorMessage);
     });
 
     it("should return an error if note is not found during deletion", async () => {
+      const errorMessage = null;
       Note.findByIdAndDelete.mockResolvedValue(null); // Simulate no note found
-
       const result = await notesService.remove("123");
-      expect(result).toEqual({ error: "Note not found" });
+      expect(result).toEqual(errorMessage);
       expect(Note.findByIdAndDelete).toHaveBeenCalledWith("123");
     });
 
     it("should return an error if there is a problem deleting the note", async () => {
-      const errorMessage = { error: "Error deleting note" };
+      const errorMessage = null;
       Note.findByIdAndDelete.mockRejectedValue(new Error("Database Error"));
 
       const result = await notesService.remove("123");
