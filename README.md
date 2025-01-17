@@ -5,28 +5,35 @@ API Backend for [Stickies App](https://github.com/wassamz/Stickies-App).
 **User Features:** 
 * Sign-up & Login routes
 * Notes CRUD routes
+* Password Reset with OTP sent to user email
 
 **Security Features**
 * JWT encryption for Access and Refresh Tokens. 
 * Encrypted & salted user passwords within the DB. 
 * Rate Limitter for requests
+* OTP generated using cryptographically secure random number generator
+
+**System Features**
+* Logging capabilities for Info, Debug, etc. 
 
 ## Getting Started
 To start, configure the environment settings: 
-1. SERVER
+1. LOG_LEVEL - Logging level can be set to info or debug
+
+2. SERVER
 NODE_ENV if set to Production enables the secure flag for cookies. 
 HOST - Server domain running this API
 PORT - Port to listen to for requests
 
-2. MONGO DATABASE - Settings to connect to MongoDB
+3. MONGO DATABASE - Settings to connect to MongoDB
 
-3. FRONTEND_DOMAIN - Used for CORS origins to secure browser requests
+4. FRONTEND_DOMAIN - Used for CORS origins to secure browser requests
 
-4. JWT - Settings to secure Access and Refresh Tokens
+5. JWT - Settings to secure Access and Refresh Tokens
 
-5. PWD - password related policy settings 
+6. PWD - password related policy settings 
 
-6. SMTP - Mail server settings
+7. SMTP - Mail server settings
 
 A sample environment is included.
 

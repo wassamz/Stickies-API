@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const config = {
+  logLevel: process.env.LOG_LEVEL,
+
   host: process.env.HOST,
   port: process.env.PORT,
   nodeenv: process.env.NODE_ENV,
