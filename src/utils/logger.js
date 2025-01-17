@@ -8,6 +8,9 @@ const Level = {
   DEBUG: "debug",
 };
 
+export const getLoggingLevel = () => config.logLevel;
+export const isDebugEnabled = () => config.logLevel === Level.DEBUG;
+
 const loggerTransports = [
   new transports.Console(),
   new transports.File({ filename: "app.log", level: Level.INFO }), // Log info level and above to app.log
@@ -32,12 +35,27 @@ const logger = createLogger({
   transports: loggerTransports,
 });
 
-export function getLoggingLevel() {
-  return config.logLevel;
-}
+// Customized HTTP Request logging for Morgan module
+export const morganFormat = (tokens, req, res) => {
+  const status = tokens.status(req, res);
+  const logMessage = [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    status,
+    tokens.res(req, res, "content-length"),
+    "-",
+    tokens["response-time"](req, res),
+    "ms",
+  ].join(" ");
 
-export function isDebugEnabled() {
-  return config.logLevel === Level.DEBUG;
-}
+  // Log to appropriate logger method based on status code
+  if (status >= 400) {
+    logger.error(logMessage);
+  } else {
+    logger.info(logMessage);
+  }
+
+  return null; // Return null to prevent morgan from logging to the console
+};
 
 export default logger;
