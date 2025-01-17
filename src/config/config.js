@@ -18,6 +18,16 @@ const config = {
   dbHost: process.env.DB_HOST,
   dbName: process.env.DB_NAME,
   dbAppName: process.env.DB_APP_NAME,
+
+  pwdMaxRetryAttempts: process.env.PWD_MAX_RETRY_ATTEMPTS,
+  pwdMaxForgetRetryAttempts: process.env.PWD_MAX_FORGET_RETRY_ATTEMPTS,
+  pwdResetOTPExpireTime: process.env.PWD_RESET_OTP_EXPIRE_TIME,
+
+  smtpFromName: process.env.SMTP_FROM_NAME,
+  smtpEmail: process.env.SMTP_EMAIL,
+  smtpPassword: process.env.SMTP_PASSWORD,
+  smtpHost: process.env.SMTP_HOST,
+  smtpPort: process.env.SMTP_PORT,
 };
 
 export default config;
