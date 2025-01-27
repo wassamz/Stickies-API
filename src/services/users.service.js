@@ -84,15 +84,19 @@ async function forgotPassword(email) {
   return { message: "OTP Forgot Password proccessed successfully" };
 }
 
-async function resetPassword(email, otp, newPassword) {
+async function resetPassword(email, newPassword, otp) {
   logger.debug(`resetPassword: ${email} OTP: ${otp}`);
-
+  
   let user = await getUser(email);
+  logger.debug(`resetPassword-getUser: ${JSON.stringify(user)}`);
   if (!user) return null; //no user found
 
   let otpData = await OTP.findOne({ userId: user._id });
+  logger.debug(`resetPassword-getUserOTP: ${JSON.stringify(otpData)}`);
   if (!otpData) return null; //OTP not found
-
+  
+  otp = parseInt(otp);
+  
   //check OTP retry attempts and if OTP doesn't match
   if (
     otpData.retries >= config.pwdMaxForgetRetryAttempts ||

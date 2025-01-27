@@ -10,7 +10,7 @@ const cookieOptions = {
   secure: config.nodeenv === "production", // Set Secure flag only in production
   sameSite: "Strict", // CSRF protection
   maxAge: ms(config.jwtRefreshExpireTime), // Cookie expiration in milliseconds
-}
+};
 
 const signup = async (req, res, next) => {
   try {
@@ -74,15 +74,18 @@ const login = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   const result = await usersService.forgotPassword(req.body.email);
-  if (!result) res.status(404).json({ error: "Forgot Password unsuccessful" });
-  res.status(200).json({ message: "OTP sent to email on record." });
+  if (!result)
+    return res.status(404).json({ error: "Forgot Password unsuccessful" });
+  return res.status(200).json({ message: "OTP sent to email on record." });
 };
 
 const resetPassword = async (req, res) => {
+  logger.info("Controller: Reset Password = " + JSON.stringify(req.body));
   const { email, newPassword, otp } = req.body;
-  const result = await usersService.resetPassword(email, otp, newPassword);
-  if (!result) res.status(400).json({ error: "Password Reset unsuccessful" });
-  else res.status(200).json({ message: "Password reset successful." });
+  const result = await usersService.resetPassword(email, newPassword, otp);
+  if (!result)
+    return res.status(400).json({ error: "Password Reset unsuccessful" });
+  else return res.status(200).json({ message: "Password reset successful." });
 };
 
 export default { signup, login, forgotPassword, resetPassword };

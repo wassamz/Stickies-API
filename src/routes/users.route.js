@@ -36,8 +36,8 @@ router.post(
   "/resetPassword",
   [
     check("email").normalizeEmail().isEmail(),
-    check("otp").isNumeric().not().isEmpty(),
-    check("newPassword").isLength({ min: 6 })
+    check("newPassword").isLength({ min: 6 }),
+    check("otp").isNumeric().not().isEmpty()
   ],
   validateRequest,
   usersController.resetPassword
