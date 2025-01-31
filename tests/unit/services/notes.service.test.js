@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import notesService from "../../../src/services/notes.service.js";
-
+import logger from '../../../src/utils/logger.js';
 import Note from "../../../src/models/Note.js";
 
 describe("Notes Service", () => {
   beforeEach(() => {
     vi.mock("../../../src/models/Note.js");
+    vi.mock('../../../src/utils/logger.js');
+
   });
   describe("getNotes", () => {
     it("should return an empty array if no userId is provided", async () => {
@@ -157,6 +159,39 @@ describe("Notes Service", () => {
       const result = await notesService.remove("123");
       expect(result).toEqual(errorMessage);
       expect(Note.findByIdAndDelete).toHaveBeenCalledWith("123");
+    });
+  });
+
+  describe('notesService.updateOrder', () => {
+    const mockData = [
+      { _id: '123', order: 1 },
+      { _id: '456', order: 2 }
+    ];
+  
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+  
+    it('should update the order of notes successfully', async () => {
+      Note.findByIdAndUpdate.mockResolvedValueOnce(mockData[0]);
+      Note.findByIdAndUpdate.mockResolvedValueOnce(mockData[1]);
+  
+      const result = await notesService.updateOrder(mockData);
+  
+      expect(Note.findByIdAndUpdate).toHaveBeenCalledTimes(2);
+      expect(Note.findByIdAndUpdate).toHaveBeenCalledWith(mockData[0]._id, { order: mockData[0].order });
+      expect(Note.findByIdAndUpdate).toHaveBeenCalledWith(mockData[1]._id, { order: mockData[1].order });
+      expect(result).toEqual({ message: 'Notes reordered successfully' });
+    });
+  
+    it('should log an error and return null if updating order fails', async () => {
+      Note.findByIdAndUpdate.mockRejectedValueOnce(new Error('Update failed'));
+  
+      const result = await notesService.updateOrder(mockData);
+  
+      expect(Note.findByIdAndUpdate).toHaveBeenCalledTimes(1);
+      expect(logger.error).toHaveBeenCalledWith('Unable to reorder notes: ', expect.any(Error));
+      expect(result).toBeNull();
     });
   });
 });
