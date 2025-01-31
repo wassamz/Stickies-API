@@ -1,59 +1,94 @@
 # Stickies API
 
-API Backend for [Stickies App](https://github.com/wassamz/Stickies-App).
+API Backend for the [Stickies App](https://github.com/wassamz/Stickies-App).
 
-**User Features:** 
-* Sign-up & Login routes
-* Notes CRUD routes
-* Password Reset with OTP sent to user email
+Built with **Node.js**, **Express v4**, and **Vitest v3** for testing.
 
-**Security Features**
-* JWT encryption for Access and Refresh Tokens. 
-* Encrypted & salted user passwords within the DB. 
-* Rate Limitter for requests
-* OTP generated using cryptographically secure random number generator
+## Features
 
-**System Features**
-* Logging capabilities for Info, Debug, etc. 
+### User Features:
+- **User Authentication**: Sign-up and login routes.
+- **Password Reset**: OTP sent to the user's email for password reset.
+- **Notes CRUD**: Create, read, update, and delete sticky notes.
+- **Sortable Notes**: Notes have a sortable order number to retain the user's preferred order.
+
+### Security Features:
+- **JWT Encryption**: Secure Access and Refresh Tokens using JSON Web Tokens (`jsonwebtoken`).
+- **Password Encryption**: User passwords are hashed and salted using `bcrypt` before storing in the database.
+- **Rate Limiting**: Protection against DDoS and brute-force attacks with `express-rate-limit`.
+- **OTP Generation**: One-time passwords are generated using a cryptographically secure random number generator (`Node Crypto`).
+- **Request Validation**: Ensures that incoming request parameters are valid with `express-validator`.
+
+### System Features:
+- **Logging**: Configurable logging levels (info, debug, etc.) using `Winston` and `Morgan` for logging requests and other system events.
+
+---
 
 ## Getting Started
-To start, configure the environment settings: 
-1. LOG_LEVEL - Logging level can be set to info or debug
 
-2. SERVER
-NODE_ENV if set to Production enables the secure flag for cookies. 
-HOST - Server domain running this API
-PORT - Port to listen to for requests
+To get started, you'll need to configure the following environment variables:
 
-3. MONGO DATABASE - Settings to connect to MongoDB
+### 1. **Logging Configuration**
+- `LOG_LEVEL`: Set the logging level to `info` or `debug` to control log verbosity.
 
-4. FRONTEND_DOMAIN - Used for CORS origins to secure browser requests
+### 2. **Server Configuration**
+- `NODE_ENV`: Set to `production` for secure cookie handling.
+- `HOST`: The domain where the API will be hosted.
+- `PORT`: The port on which the server will listen for incoming requests.
 
-5. JWT - Settings to secure Access and Refresh Tokens
+### 3. **MongoDB Configuration**
+- Connection details for [MongoDB](https://www.mongodb.com/) (e.g., `MONGO_URI`, `MONGO_DB_NAME`).
 
-6. PWD - password related policy settings 
+### 4. **CORS Configuration**
+- `FRONTEND_DOMAIN`: Set the frontend domain for CORS to restrict which origins can make requests to the API.
 
-7. SMTP - Mail server settings
+### 5. **JWT Configuration**
+- Configure JWT secret and expiration settings for Access and Refresh tokens.
 
-A sample environment is included.
+### 6. **Password Policy Settings**
+- Password Retry Policies
+
+### 7. **SMTP Configuration**
+- SMTP settings for sending emails (for password reset functionality).
+
+### 8. **Note Size Limits**
+- Default character limits for notes to prevent excessive data storage.
+
+A sample `.env` file is provided for reference.
+
+---
 
 ## Available Scripts
 
-In the project directory, you can run:
+In the project directory, you can run the following commands:
 
 ### `npm start`
 
-Runs the app in the using the settings in the .env file
+Runs the app using the settings in the `.env` file. The application will be hosted on the configured port.
 
 ### `npm test`
 
-Launches the vitest runner in the interactive watch mode.\
+Runs tests using Vitest in interactive watch mode. Ensures code quality and functionality.
 
+### `npm lint`
 
-### Deployment
-Dockerfile included to deploy as a standalone frontend server. 
-Sample deploy commands:
+Runs ESLint to check for code style violations.
+
+### `npm lint:fix`
+
+Automatically fixes fixable code style issues using ESLint.
+
+---
+
+## Deployment
+
+To deploy this API as a standalone server, you can use Docker.
+
+### Docker Deployment
+
 ```bash
+# Build the Docker image
 docker build -t stickies-api .
+
+# Run the Docker container
 docker run --name stickies-api -p 3001:3001 stickies-api
-```
