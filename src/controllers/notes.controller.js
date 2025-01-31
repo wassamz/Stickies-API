@@ -20,10 +20,16 @@ async function update(req, res) {
   else res.status(201).json(result);
 }
 
+async function updateOrder(req, res) {
+  const result = await notesService.updateOrder(req.body);
+  if (!result) res.status(500).json({ error: "Error updating note" });
+  else res.status(201).json(result);
+}
+
 async function remove(req, res) {
   const result = await notesService.remove(req.params.id);
   if (!result) res.status(500).json({ error: "Error deleting note" });
-  else res.status(201).json({ message: "Note deleted successfully"} );
+  else res.status(201).json({ message: "Note deleted successfully" });
 }
 
-export default { get, create, update, remove };
+export default { get, create, update, updateOrder, remove };

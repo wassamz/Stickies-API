@@ -47,6 +47,19 @@ async function update(note) {
   }
 }
 
+async function updateOrder(data){
+  logger.debug("Note Update Order: " + JSON.stringify(data));
+  
+  try {
+    await Note.findByIdAndUpdate(data[0]._id, { order: data[0].order });
+    await Note.findByIdAndUpdate(data[1]._id, { order: data[1].order });
+    return { message: "Notes reordered successfully"};
+  } catch (error) {
+    logger.error("Unable to reorder notes: ", error);
+    return null;
+  }
+}
+
 async function remove(id) {
   logger.debug("Note Delete id:" + JSON.stringify(id));
   if (!id) {
@@ -67,4 +80,4 @@ async function remove(id) {
   }
 }
 
-export default { getNotes, create, update, remove };
+export default { getNotes, create, update, updateOrder, remove };
