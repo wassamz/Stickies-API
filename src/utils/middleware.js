@@ -39,7 +39,7 @@ export function setupMiddleware(app) {
   });
 
   // Error-handling middleware
-  app.use((err, req, res, next) => {
+  app.use((err, req, res) => {
     logger.error(err); // For debugging, logs the error stack
     res.status(err.status || 500).json({
       error: err.message || "Internal Server Error",
