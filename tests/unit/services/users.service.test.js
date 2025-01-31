@@ -162,13 +162,17 @@ describe("Users Service", () => {
     it("should reset the password if OTP is valid", async () => {
       const mockEmail = "test@example.com";
       const mockOTP = 1234;
-      const mockNewPassword = "newPassword123";
+      const mockNewPassword = "NewPassword123$";
       const mockUser = {
         _id: "123",
         email: mockEmail,
         save: vi.fn().mockResolvedValueOnce(),
       };
-      const mockOTPData = { userId: mockUser._id, otp: mockOTP, retries: 1 };
+      const mockOTPData = {
+        userId: mockUser._id,
+        otp: mockOTP,
+        retries: 1,
+      };
       const successMessage = {
         message: "OTP Reset Password proccessed successfully",
       };
@@ -179,8 +183,8 @@ describe("Users Service", () => {
 
       const result = await userService.resetPassword(
         mockEmail,
-        mockOTP,
-        mockNewPassword
+        mockNewPassword,
+        mockOTP
       );
       expect(result).toEqual(successMessage);
       expect(User.findOne).toHaveBeenCalledWith({ email: mockEmail });
