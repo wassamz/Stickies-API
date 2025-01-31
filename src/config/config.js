@@ -30,6 +30,9 @@ const config = {
   smtpPassword: process.env.SMTP_PASSWORD,
   smtpHost: process.env.SMTP_HOST,
   smtpPort: process.env.SMTP_PORT,
+
+  noteTitleMaxLength: process.env.NOTE_TITLE_MAX_LENGTH,
+  noteContentMaxLength: process.env.NOTE_CONTENT_MAX_LENGTH,
 };
 
 export default config;
