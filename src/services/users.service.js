@@ -85,7 +85,7 @@ async function forgotPassword(email) {
 }
 
 async function resetPassword(email, newPassword, otp) {
-  logger.debug(`resetPassword: ${email} OTP: ${otp}`);
+  logger.debug(`resetPassword email:${email} OTP: ${otp}`);
   
   let user = await getUser(email);
   logger.debug(`resetPassword-getUser: ${JSON.stringify(user)}`);
