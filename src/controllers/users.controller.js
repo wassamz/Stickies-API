@@ -1,8 +1,8 @@
 import { validationResult } from "express-validator";
+import ms from "ms"; //utility function to convert string to milliseconds
 import config from "../config/config.js";
 import usersService from "../services/users.service.js";
 import { createAccessToken, createRefreshToken } from "../utils/auth.js";
-import ms from "ms"; //utility function to convert string to milliseconds
 import logger from "../utils/logger.js";
 
 const cookieOptions = {
@@ -32,9 +32,9 @@ const signup = async (req, res, next) => {
     res
       .cookie("refreshToken", refreshToken, cookieOptions)
       .status(201) // Status code for successful resource creation
+      .header("Authorization", `Bearer ${accessToken}`)
       .json({
         message: "User created.",
-        accessToken: accessToken, // Send the access token in the response body
       });
   } catch (error) {
     logger.error("Unable to sign up user: ", error);
@@ -66,9 +66,9 @@ const login = async (req, res) => {
   res
     .cookie("refreshToken", refreshToken, cookieOptions)
     .status(200) // Status code for successful login
+    .header("Authorization", `Bearer ${accessToken}`)
     .json({
       message: "Login successful",
-      accessToken: accessToken, // Send access token in the response body
     });
 };
 
@@ -88,4 +88,13 @@ const resetPassword = async (req, res) => {
   else return res.status(200).json({ message: "Password reset successful." });
 };
 
-export default { signup, login, forgotPassword, resetPassword };
+const refreshToken = async (req, res) => {
+  const userId = req.body.userId;
+  // Generate new token
+  const newAccessToken = createAccessToken(userId);
+  res.status(200).header("Authorization", `Bearer ${newAccessToken}`).json({
+    message: "new access token generated",
+  });
+};
+
+export default { signup, login, forgotPassword, resetPassword, refreshToken };

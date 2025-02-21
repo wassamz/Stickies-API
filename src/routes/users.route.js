@@ -1,7 +1,6 @@
 import express from "express";
 import usersController from "../controllers/users.controller.js";
 import { checkRefreshToken } from "../middlewares/auth.middleware.js";
-import { createAccessToken } from "../utils/auth.js";
 import {
   validateForgotPassword,
   validateLogin,
@@ -30,13 +29,6 @@ router.post(
   usersController.resetPassword
 );
 
-router.post("/refresh-token", checkRefreshToken, (req, res) => {
-  const userId = req.body.userId;
-  // Generate new token
-  const newAccessToken = createAccessToken(userId);
-  res.json({
-    accessToken: newAccessToken,
-  });
-});
+router.post("/refresh-token", checkRefreshToken, usersController.refreshToken);
 
 export default router;
