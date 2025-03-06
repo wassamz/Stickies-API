@@ -19,23 +19,26 @@ const signup = async (req, res, next) => {
       logger.info(errors.array());
       return res.status(500).json({ errors: errors.array() });
     }
-    const { email } = req.body;
-    const userExists = await usersService.getUser(email);
-    if (userExists) return res.status(422).json("User already exists");
-    const createdUser = await usersService.saveUser(req.body);
 
-    // Generate access and refresh tokens
-    const accessToken = createAccessToken(createdUser._id);
-    const refreshToken = createRefreshToken(createdUser._id);
+    const { name, email, password, otp } = req.body;
+    const user = await usersService.signUp(name, email, password, otp);
 
-    // Set the refresh token in HttpOnly cookie and send the access token in the response
-    res
-      .cookie("refreshToken", refreshToken, cookieOptions)
-      .status(201) // Status code for successful resource creation
-      .header("Authorization", `Bearer ${accessToken}`)
-      .json({
-        message: "User created.",
-      });
+    if (user.error) return res.status(400).json(user); //return error message
+    else {
+      // User created successfully
+      // Generate access and refresh tokens
+      const accessToken = createAccessToken(user._id);
+      const refreshToken = createRefreshToken(user._id);
+
+      // Set the refresh token in HttpOnly cookie and send the access token in the response
+      res
+        .cookie("refreshToken", refreshToken, cookieOptions)
+        .status(201) // Status code for successful resource creation
+        .header("Authorization", `Bearer ${accessToken}`)
+        .json({
+          message: "User created.",
+        });
+    }
   } catch (error) {
     logger.error("Unable to sign up user: ", error);
     next(error);
@@ -72,6 +75,12 @@ const login = async (req, res) => {
     });
 };
 
+const checkEmail = async (req, res) => {
+  const result = await usersService.checkEmail(req.body.email);
+  if (result.error) return res.status(404).json(result);
+  return res.status(200).json(result);
+};
+
 const forgotPassword = async (req, res) => {
   const result = await usersService.forgotPassword(req.body.email);
   if (!result)
@@ -97,4 +106,11 @@ const refreshToken = async (req, res) => {
   });
 };
 
-export default { signup, login, forgotPassword, resetPassword, refreshToken };
+export default {
+  signup,
+  login,
+  checkEmail,
+  forgotPassword,
+  resetPassword,
+  refreshToken,
+};
