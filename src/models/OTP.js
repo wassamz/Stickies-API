@@ -9,7 +9,7 @@ const OTPSchema = new Schema(
     userId: {
       type: SchemaTypes.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
     email: {
       type: String,
