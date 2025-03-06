@@ -34,6 +34,7 @@ const validOTPCheck = check("otp")
   .isNumeric()
   .not()
   .isEmpty()
+  .isLength({ min: config.otpLength, max: config.otpLength })
   .withMessage("Invalid OTP");
 
 const validTitleCheck = check("title")
@@ -66,11 +67,12 @@ export const validateSignUp = [
   validNameCheck,
   validEmailCheck,
   validPasswordCheck("password"),
+  validOTPCheck,
 ];
 
 export const validateLogin = [validEmailCheck, validPasswordCheck("password")];
 
-export const validateForgotPassword = [validEmailCheck];
+export const validatePassword = [validEmailCheck];
 
 export const validateResetPassword = [
   validEmailCheck,
