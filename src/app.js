@@ -1,9 +1,9 @@
-import config from "./config/config.js";
 import express from "express";
-import { setupMiddleware } from "./utils/middleware.js";
+import config from "./config/config.js";
+import { setupMiddleware } from "./middlewares/setupMiddleware.js";
 import { initializeDatabase } from "./utils/database.js";
-import { gracefulShutdown } from "./utils/shutdown.js";
 import logger from "./utils/logger.js";
+import { gracefulShutdown } from "./utils/shutdown.js";
 
 const app = express();
 
