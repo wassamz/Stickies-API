@@ -38,4 +38,6 @@ router.post(
 
 router.post("/refresh-token", checkRefreshToken, usersController.refreshToken);
 
+router.post("/logout", usersController.logout);
+
 export default router;
