@@ -70,7 +70,7 @@ describe("Users Controller", () => {
       expect(res.json).toHaveBeenCalledWith({ message: "User created." });
     });
 
-    it("should return 400 if signup fails", async () => {
+    it("should return 409 if signup if user already exists", async () => {
       req.body = {
         email: "test@example.com",
         password: "Password123!"
@@ -80,7 +80,7 @@ describe("Users Controller", () => {
 
       await usersController.signup(req, res, next);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(409);
       expect(res.json).toHaveBeenCalledWith({ error: "User already exists" });
     });
   });
@@ -140,7 +140,7 @@ describe("Users Controller", () => {
       expect(res.json).toHaveBeenCalledWith(mockResult);
     });
 
-    it("should return 404 when email check fails", async () => {
+    it("should return 403 when email check fails", async () => {
       req.body = { email: "test@example.com" };
       const mockError = { error: "User not found" };
 
@@ -148,7 +148,7 @@ describe("Users Controller", () => {
 
       await usersController.checkEmail(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith(mockError);
     });
   });

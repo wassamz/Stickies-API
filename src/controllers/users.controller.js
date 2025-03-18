@@ -9,36 +9,47 @@ const cookieOptions = {
   httpOnly: true,
   secure: config.nodeenv === "production", // Set Secure flag only in production
   sameSite: "Strict", // CSRF protection
-  maxAge: ms(config.jwtRefreshExpireTime), // Cookie expiration in milliseconds
+  maxAge: ms(config.jwtRefreshExpireTime), // Convert and set cookie expiration in milliseconds
 };
 
 const signup = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      logger.info(errors.array());
+      logger.error(errors.array());
       return res.status(500).json({ errors: errors.array() });
     }
 
     const { name, email, password, otp } = req.body;
-    const user = await usersService.signUp(name, email, password, otp);
-
-    if (user.error) return res.status(400).json(user); //return error message
-    else {
-      // User created successfully
-      // Generate access and refresh tokens
-      const accessToken = createAccessToken(user._id);
-      const refreshToken = createRefreshToken(user._id);
-
-      // Set the refresh token in HttpOnly cookie and send the access token in the response
-      res
-        .cookie("refreshToken", refreshToken, cookieOptions)
-        .status(201) // Status code for successful resource creation
-        .header("Authorization", `Bearer ${accessToken}`)
-        .json({
-          message: "User created.",
-        });
+    logger.info(`Controller: Sign Up = name:${name} email:${email} otp:${otp}`);
+    const result = await usersService.signUp(name, email, password, otp);
+    if (result.error) {
+      // Different status codes based on error type
+      switch (result.error) {
+        case "User already exists":
+        case "Maximum retry attempts exceeded":
+          return res.status(409).json({ error: result.error });
+        case "OTP is incorrect":
+        case "Sign Up Unsuccessful":
+          return res.status(422).json({ error: result.error });
+        default:
+          return res.status(400).json({ error: result.error });
+      }
     }
+
+    // User created successfully
+    // Generate access and refresh tokens
+    const accessToken = createAccessToken(result._id);
+    const refreshToken = createRefreshToken(result._id);
+
+    // Set the refresh token in HttpOnly cookie and send the access token in the response
+    res
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .status(201) // Status code for successful resource creation
+      .header("Authorization", `Bearer ${accessToken}`)
+      .json({
+        message: "User created.",
+      });
   } catch (error) {
     logger.error("Unable to sign up user: ", error);
     next(error);
@@ -47,6 +58,7 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
+  logger.info("Controller: Login = " + email);
   if (!email || !password) {
     return res.status(400).json({
       error: "Please provide both email and password.",
@@ -55,8 +67,11 @@ const login = async (req, res) => {
 
   const validCredential = await usersService.validateUser(email, password);
 
-  if (!validCredential) {
-    //Could not identify user, credentials seem to be wrong.
+  if (validCredential === null) {
+    logger.warn(
+      "Login Error: Could not identify user, credentials seem to be wrong."
+    );
+
     return res.status(401).json({
       error: "Could not identify user, credentials seem to be wrong.",
     });
@@ -68,7 +83,7 @@ const login = async (req, res) => {
   // Set the refresh token in HttpOnly cookie and send the access token in the response
   res
     .cookie("refreshToken", refreshToken, cookieOptions)
-    .status(200) // Status code for successful login
+    .status(200)
     .header("Authorization", `Bearer ${accessToken}`)
     .json({
       message: "Login successful",
@@ -76,12 +91,14 @@ const login = async (req, res) => {
 };
 
 const checkEmail = async (req, res) => {
+  logger.info("Controller:  Check Email = " + JSON.stringify(req.body));
   const result = await usersService.checkEmail(req.body.email);
-  if (result.error) return res.status(404).json(result);
+  if (result.error) return res.status(403).json(result);
   return res.status(200).json(result);
 };
 
 const forgotPassword = async (req, res) => {
+  logger.info("Controller: Forgot Password = " + JSON.stringify(req.body));
   const result = await usersService.forgotPassword(req.body.email);
   if (!result)
     return res.status(404).json({ error: "Forgot Password unsuccessful" });
@@ -106,9 +123,16 @@ const refreshToken = async (req, res) => {
   });
 };
 
+const logout = async (req, res) => {
+  res.clearCookie("refreshToken").status(200).json({
+    message: "User logged out successfully.",
+  });
+};
+
 export default {
   signup,
   login,
+  logout,
   checkEmail,
   forgotPassword,
   resetPassword,
