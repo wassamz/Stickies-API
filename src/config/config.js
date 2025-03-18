@@ -27,12 +27,12 @@ const config = {
   dbMaxRetries: parseInt(process.env.DB_MAX_RETRIES5 || "5"),
   dbRetryDelay: parseInt(process.env.DB_RETRY_DELAY || "5000"),
 
-  pwdMaxRetryAttempts: process.env.PWD_MAX_RETRY_ATTEMPTS || "3",
-  pwdResetOTPExpireTime: process.env.PWD_RESET_OTP_EXPIRE_TIME || "600",
+
 
   otpLength: parseInt(process.env.OTP_LENGTH || "4"),
   otpMin: Math.pow(10, parseInt(process.env.OTP_LENGTH || "4") - 1),
   otpMax: Math.pow(10, parseInt(process.env.OTP_LENGTH || "4")) - 1,
+  otpExpireTime: process.env.OTP_EXPIRE_TIME || "600",
   otpMaxRetryAttempts: parseInt(process.env.OTP_MAX_RETRY_ATTEMPTS || "4"),
 
   smtpFromName: process.env.SMTP_FROM_NAME,
