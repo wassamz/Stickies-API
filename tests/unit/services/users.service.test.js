@@ -141,8 +141,8 @@ describe("Users Service", () => {
       const mockEmail = "maxretries@example.com";
       const mockOTP = {
         email: mockEmail,
-        otp: 1234,
-        retries: config.pwdMaxForgetRetryAttempts,
+        otp: 1111,
+        retries: config.otpMaxRetryAttempts,
       };
 
       User.findOne.mockResolvedValueOnce(null);
@@ -327,7 +327,7 @@ describe("Users Service", () => {
       const mockOTP = {
         userId: mockUser._id,
         otp: 1234,
-        retries: config.pwdMaxForgetRetryAttempts,
+        retries: config.otpMaxRetryAttempts,
       };
 
       User.findOne.mockResolvedValueOnce(mockUser);
@@ -443,7 +443,7 @@ describe("Users Service", () => {
       const mockOTPData = {
         userId: mockUser._id,
         otp: 5678,
-        retries: config.pwdMaxForgetRetryAttempts,
+        retries: config.otpMaxRetryAttempts,
         save: vi.fn().mockResolvedValueOnce(),
       };
 

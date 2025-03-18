@@ -35,7 +35,12 @@ async function validateUser(email, password) {
     if (!user) return null;
 
     let isMatch = await user.comparePassword(password);
-    logger.debug("User Validate - password match successful: " + email);
+    logger.debug(
+      "User Validate - does password match?: " +
+        email +
+        " isMatch:" +
+        isMatch
+    );
     return isMatch ? user : null;
   } catch (error) {
     logger.error("User Validate - Unable to validate user: ", error);
@@ -56,7 +61,7 @@ async function signUp(name, email, password, otp) {
   otp = parseInt(otp);
   //check OTP retry attempts and if OTP doesn't match
   if (
-    otpData.retries >= config.pwdMaxForgetRetryAttempts ||
+    otpData.retries >= config.otpMaxRetryAttempts ||
     otpData.otp !== otp
   ) {
     otpData.retries++;
@@ -64,7 +69,9 @@ async function signUp(name, email, password, otp) {
     logger.error(
       `User SignUp - Invalid OTP: ${otp} Retry Count: ${otpData.retries}`
     );
-    return { error: "OTP is incorrect" };
+    return otpData.otp !== otp
+      ? { error: "OTP is incorrect" }
+      : { error: "Maximum retry attempts exceeded" };
   }
   logger.info(` OTP: ${otp} OTPData: ${otpData.otp}`);
 
@@ -83,7 +90,7 @@ async function signUp(name, email, password, otp) {
       return user;
     } catch (error) {
       logger.error("User SignUp - Unable to create user: ", error);
-      return { error: "Unable to create user" };
+      return { error: "Sign Up Unsuccessful" };
     }
   }
   return null;
@@ -103,7 +110,7 @@ async function checkEmail(email) {
   //check if OTP has recently been attempted
   let otpData = await OTP.findOne({ email: email });
   if (otpData) {
-    if (otpData.retries >= config.pwdMaxForgetRetryAttempts) {
+    if (otpData.retries >= config.otpMaxRetryAttempts) {
       logger.error(
         "checkEmail - Maximum retry attempts exceeded for user: " + email
       );
@@ -146,7 +153,7 @@ async function forgotPassword(email) {
   //check if OTP has recently been attempted
   let otpData = await OTP.findOne({ userId: user._id });
   if (otpData) {
-    if (otpData.retries >= config.pwdMaxForgetRetryAttempts) {
+    if (otpData.retries >= config.otpMaxRetryAttempts) {
       logger.error(
         "forgotPassword - Maximum retry attempts exceeded for user: " + email
       );
@@ -199,7 +206,7 @@ async function resetPassword(email, newPassword, otp) {
 
   //check OTP retry attempts and if OTP doesn't match
   if (
-    otpData.retries >= config.pwdMaxForgetRetryAttempts ||
+    otpData.retries >= config.otpMaxRetryAttempts ||
     otpData.otp !== otp
   ) {
     otpData.retries = otpData.retries + 1;
