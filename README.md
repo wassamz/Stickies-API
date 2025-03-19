@@ -8,7 +8,7 @@ Built with **Node.js**, **Express v4**, and **Vitest v3** for testing.
 
 ### User Features:
 - **User Authentication**: Sign-up and login routes.
-- **Password Reset**: OTP sent to the user's email for password reset.
+- **One Time Password**: OTP sent to the user's email for sign up & password reset.
 - **Notes CRUD**: Create, read, update, and delete sticky notes.
 - **Sortable Notes**: Notes have a sortable order number to retain the user's preferred order.
 
@@ -18,6 +18,7 @@ Built with **Node.js**, **Express v4**, and **Vitest v3** for testing.
 - **Rate Limiting**: Protection against DDoS and brute-force attacks with `express-rate-limit`.
 - **OTP Generation**: One-time passwords are generated using a cryptographically secure random number generator (`Node Crypto`).
 - **Request Validation**: Ensures that incoming request parameters are valid with `express-validator`.
+- **Database Retry Logic**: Backoff retry algorithm to reconnect to database.
 
 ### System Features:
 - **Logging**: Configurable logging levels (info, debug, etc.) using `Winston` and `Morgan` for logging requests and other system events.
@@ -45,8 +46,8 @@ To get started, you'll need to configure the following environment variables:
 ### 5. **JWT Configuration**
 - Configure JWT secret and expiration settings for Access and Refresh tokens.
 
-### 6. **Password Policy Settings**
-- Password Retry Policies
+### 6. **OTP Settings**
+- OTP Expiry & Retry Policies
 
 ### 7. **SMTP Configuration**
 - SMTP settings for sending emails (for password reset functionality).

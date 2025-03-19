@@ -9,7 +9,7 @@ const OTPSchema = new Schema(
     userId: {
       type: SchemaTypes.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
     email: {
       type: String,
@@ -33,7 +33,7 @@ const OTPSchema = new Schema(
 
 OTPSchema.index(
   { createdAt: 1 },
-  { expireAfterSeconds: parseInt(config.pwdResetOTPExpireTime) || defaultExpiration }
+  { expireAfterSeconds: parseInt(config.otpExpireTime) || defaultExpiration }
 );
 
 const OTP = model("OTP", OTPSchema);

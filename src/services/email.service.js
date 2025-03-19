@@ -15,7 +15,7 @@ function otpMailOptions(to, otp) {
   return {
     from: `"${config.smtpFromName}" <${config.smtpEmail}>`, // sender address
     to: to, // receiver address
-    subject: "Stickies - Password Reset", // Subject line
+    subject: "Stickies - One Time Password", // Subject line
     text: `To authenticate, please use the following One Time Password (OTP):
           ${otp}
       Don't share this OTP with anyone.`, // plain text body
@@ -33,7 +33,7 @@ function otpMailOptions(to, otp) {
           </style>
       </head>
       <body>
-        <h2>Stickies - Password Reset</h2>
+        <h2>Stickies - One Time Password</h2>
         <div>
             <p>To authenticate, please use the following One Time Password (OTP):</p>
             <p class="otp">${otp}</p>
