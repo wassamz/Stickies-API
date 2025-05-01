@@ -2,8 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
-import path, { dirname } from "path";
-import { fileURLToPath } from "url";
+import path from "path";
 
 import config from "../config/config.js";
 import notesRouter from "../routes/notes.route.js";
@@ -12,8 +11,6 @@ import logger, { morganFormat } from "../utils/logger.js";
 import { authLimiter } from "./rateLimiter.middleware.js";
 
 export function setupMiddleware(app) {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
   app.set("trust proxy", 1); //  trust the first IP address in the X-Forwarded-For header, which is the client's original IP address.
   app.use(morgan(morganFormat));
   app.use(cookieParser());
@@ -33,13 +30,16 @@ export function setupMiddleware(app) {
   logger.info("Allowed Frontend site: " + config.allowedOrigin);
 
   // Serve static files from the 'public' directory
-  app.use(express.static(path.join(__dirname, "../public")));
+  const publicPath = path.join(process.cwd(), "public");
+  logger.info(`Serving static files from: ${publicPath}`);
+  app.use(express.static(publicPath));
+
   app.use("/notes", notesRouter);
   app.use("/users", usersRouter);
 
   // Catch-all route for undefined routes
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(publicPath, "index.html"));
   });
 
   // Error-handling middleware
