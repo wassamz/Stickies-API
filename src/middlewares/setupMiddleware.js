@@ -28,14 +28,14 @@ export function setupMiddleware(app) {
   app.use(cors(corsOptions));
 
   logger.info("Allowed Frontend site: " + config.allowedOrigin);
+  
+  app.use("/api/notes", notesRouter);
+  app.use("/api/users", usersRouter);
 
   // Serve static files from the 'public' directory
   const publicPath = path.join(process.cwd(), "public");
   logger.info(`Serving static files from: ${publicPath}`);
   app.use(express.static(publicPath));
-
-  app.use("/notes", notesRouter);
-  app.use("/users", usersRouter);
 
   // Catch-all route for undefined routes
   app.get("*", (req, res) => {
@@ -43,7 +43,7 @@ export function setupMiddleware(app) {
   });
 
   // Error-handling middleware
-  app.use((err, req, res) => {
+  app.use((err, req, res, next) => {
     logger.error(err); // For debugging, logs the error stack
     res.status(err.status || 500).json({
       error: err.message || "Internal Server Error",
